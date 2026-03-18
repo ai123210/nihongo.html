@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#D85A30">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="日本語道">
+<title>日本語道 — Nihongo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #D85A30;
+    --accent-light: #FAECE7;
+    --accent-mid: #F0997B;
+    --bg: #FAFAF8;
+    --bg2: #F2F0EB;
+    --bg3: #E8E5DF;
+    --text: #1A1916;
+    --text2: #6B6860;
+    --text3: #9E9B94;
+    --border: rgba(26,25,22,0.10);
+    --border2: rgba(26,25,22,0.18);
+    --success-bg: #EAF3DE;
+    --success: #3B6D11;
+    --danger-bg: #FCEBEB;
+    --danger: #A32D2D;
+    --warn-bg: #FAEEDA;
+    --warn: #854F0B;
+    --info-bg: #E6F1FB;
+    --info: #185FA5;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --font: 'Noto Sans JP', sans-serif;
+    --font-serif: 'Noto Serif JP', serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1A1916;
+      --bg2: #222118;
+      --bg3: #2C2B22;
+      --text: #F5F3EE;
+      --text2: #A8A49C;
+      --text3: #6B6860;
+      --border: rgba(245,243,238,0.10);
+      --border2: rgba(245,243,238,0.18);
+      --accent-light: #3A2218;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overscroll-behavior: none; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    min-height: 100%;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--border);
+    padding: 14px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: var(--font-serif);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .logo em { color: var(--accent); font-style: normal; }
+  .streak-pill {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 20px;
+  }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 480px;
+    background: var(--bg);
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 4px 8px;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    color: var(--text3);
+    font-family: var(--font);
+    font-size: 11px;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .nav-btn.active { color: var(--accent); }
+  .nav-icon { font-size: 22px; line-height: 1; }
+
+  /* SECTIONS */
+  .section { display: none; padding: 20px; animation: fadeIn 0.2s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  /* PROGRESS BAR */
+  .prog-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .prog-bar { flex: 1; height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
+  .prog-label { font-size: 13px; color: var(--text2); min-width: 40px; text-align: right; }
+
+  /* FLASHCARD */
+  .fc-wrap {
+    background: var(--bg2);
+    border-radius: var(--radius);
+    padding: 36px 24px 28px;
+    text-align: center;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 16px;
+    border: 0.5px solid var(--border);
+    transition: transform 0.12s;
+    user-select: none;
+  }
+  .fc-wrap:active { transform: scale(0.98); }
+  .fc-tag {
+    position: absolute;
+    top: 14px; right: 14px;
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .tag-n2 { background: var(--warn-bg); color: var(--warn); }
+  .tag-n3 { background: var(--info-bg); color: var(--info); }
+  .tag-n4 { background: var(--success-bg); color: var(--success); }
+  .fc-char { font-size: 58px; line-height: 1.15; color: var(--text); margin-bottom: 8px; }
+  .fc-reading { font-size: 16px; color: var(--text2); margin-bottom: 4px; }
+  .fc-meaning { font-size: 19px; font-weight: 500; color: var(--text); }
+  .fc-tap-hint { font-size: 13px; color: var(--text3); margin-top: 16px; }
+
+  .rate-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .rate-btn {
+    padding: 12px 8px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--border2);
+    background: transparent;
+    font-family: var(--font);
+    font-size: 13px;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .rate-btn:hover { background: var(--bg3); }
+  .rate-btn.hard { border-color: #E24B4A; color: #A32D2D; background: var(--danger-bg); }
+  .rate-btn.ok { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+  .rate-btn.easy { border-color: #639922; color: #3B6D11; background: var(--success-bg); }
+
+  /* KANJI */
+  .kanji-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0,1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .k-card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .k-card:active { transform: scale(0.96); }
+  .k-card.sel { border: 1.5px solid var(--accent); background: var(--accent-light); }
+  .k-char { font-size: 34px; display: block; margin-bottom: 4px; }
+  .k-on { font-size: 11px; color: var(--text2); }
+  .k-meaning { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+  .k-detail {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .k-detail.show { display: block; animation: fadeIn 0.2s ease; }
+  .k-big { font-size: 72px; text-align: center; display: block; margin-bottom: 12px; line-height: 1; }
+  .k-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 7px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .k-row:last-of-type { border-bottom: none; }
+  .k-row-label { color: var(--text2); }
+  .k-row-val { font-weight: 500; color: var(--text); }
+  .k-examples { margin-top: 10px; }
+  .k-ex { font-size: 13px; color: var(--text); padding: 4px 0; }
+  .k-ex span { color: var(--text2); }
+
+  /* GRAMMAR */
+  .g-item {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color 0.15s;
+  }
+  .g-item.open { border-color: var(--accent); }
+  .g-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    cursor: pointer;
+    gap: 10px;
+  }
+  .g-title { font-size: 15px; font-weight: 500; color: var(--text); }
+  .g-jp { font-size: 13px; color: var(--accent); margin-top: 2px; }
+  .g-level {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+  .lv-n3 { background: var(--info-bg); color: var(--info); }
+  .lv-n2 { background: var(--warn-bg); color: var(--warn); }
+  .g-body { display: none; padding: 0 16px 14px; }
+  .g-body.open { display: block; animation: fadeIn 0.15s ease; }
+  .g-desc { font-size: 13px; color: var(--text2); line-height: 1.7; margin-bottom: 10px; }
+  .g-ex {
+    background: var(--bg3);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    margin-bottom: 6px;
+  }
+  .g-ex-jp { font-size: 14px; color: var(--text); margin-bottom: 2px; }
+  .g-ex-es { font-size: 12px; color: var(--text2); }
+
+  /* CONVERSATION */
+  .scene-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .scene-card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+  .scene-card:active { transform: scale(0.97); }
+  .scene-card.sel { border: 1.5px solid var(--accent); background: var(--accent-light); }
+  .scene-icon { font-size: 26px; display: block; margin-bottom: 5px; }
+  .scene-label { font-size: 13px; font-weight: 500; color: var(--text); }
+
+  .dialog-wrap { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+  .d-line {
+    max-width: 82%;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .d-a { background: var(--bg2); border: 0.5px solid var(--border); align-self: flex-start; }
+  .d-b { background: var(--accent); color: white; align-self: flex-end; }
+  .d-speaker { font-size: 11px; opacity: 0.65; margin-bottom: 3px; display: block; }
+  .d-jp { font-weight: 500; }
+  .d-es { font-size: 12px; opacity: 0.75; margin-top: 1px; }
+
+  .tip-box {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.65;
+    margin-bottom: 14px;
+  }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .stat-box {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    text-align: center;
+  }
+  .stat-num { font-size: 32px; font-weight: 700; color: var(--text); display: block; font-family: var(--font-serif); }
+  .stat-lbl { font-size: 12px; color: var(--text2); margin-top: 3px; }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  /* SHARED BUTTON */
+  .action-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    border: 0.5px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-top: 4px;
+  }
+  .action-btn:hover { background: var(--accent); color: white; }
+  .action-btn:active { transform: scale(0.98); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--text);
+    color: var(--bg);
+    font-size: 13px;
+    padding: 9px 18px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: all 0.25s;
+    pointer-events: none;
+    z-index: 200;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* INSTALL BANNER */
+  .install-banner {
+    margin: 0 20px 0;
+    background: var(--accent-light);
+    border: 0.5px solid var(--accent-mid);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .install-text { flex: 1; font-size: 13px; color: var(--text); line-height: 1.5; }
+  .install-text strong { color: var(--accent); }
+  .install-close { font-size: 18px; cursor: pointer; color: var(--text2); padding: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">日本語<em>道</em></div>
+  <div class="streak-pill">🔥 7 días</div>
+</div>
+
+<div id="install-banner" class="install-banner" style="margin-top:12px; display:none">
+  <div class="install-text"><strong>Instalar app</strong><br>Toca el menú del navegador → "Agregar a pantalla de inicio"</div>
+  <div class="install-close" onclick="document.getElementById('install-banner').style.display='none'">×</div>
+</div>
+
+<!-- VOCABULARIO -->
+<div id="s-flash" class="section active">
+  <div class="prog-row">
+    <div class="prog-bar"><div class="prog-fill" id="fc-fill" style="width:12.5%"></div></div>
+    <div class="prog-label" id="fc-count">1/8</div>
+  </div>
+  <div class="fc-wrap" id="fc-box" onclick="revealCard()">
+    <div class="fc-tag tag-n3" id="fc-tag">N3</div>
+    <div class="fc-char" id="fc-char">曖昧</div>
+    <div class="fc-reading" id="fc-reading" style="display:none">あいまい (aimai)</div>
+    <div class="fc-meaning" id="fc-meaning" style="display:none">ambiguo, vago</div>
+    <div class="fc-tap-hint" id="fc-hint">Toca para ver la respuesta</div>
+  </div>
+  <div class="rate-btns" id="rate-btns" style="display:none">
+    <button class="rate-btn hard" onclick="rateCard()">Difícil</button>
+    <button class="rate-btn ok" onclick="rateCard()">Bien</button>
+    <button class="rate-btn easy" onclick="rateCard()">Fácil</button>
+  </div>
+  <p style="font-size:13px;color:var(--text3);text-align:center;margin-bottom:14px;" id="fc-sub">Vocabulario N2–N4 · Sistema de repetición espaciada</p>
+  <button class="action-btn" onclick="showToast('Abre Claude y pregunta por más ejemplos de: ' + currentWord())">Ver más ejemplos en Claude</button>
+</div>
+
+<!-- KANJI -->
+<div id="s-kanji" class="section">
+  <p class="section-title">Kanji de nivel intermedio</p>
+  <div class="kanji-grid" id="kanji-grid"></div>
+  <div class="k-detail" id="k-detail">
+    <span class="k-big" id="kd-char"></span>
+    <div class="k-row"><span class="k-row-label">On'yomi</span><span class="k-row-val" id="kd-on"></span></div>
+    <div class="k-row"><span class="k-row-label">Kun'yomi</span><span class="k-row-val" id="kd-kun"></span></div>
+    <div class="k-row"><span class="k-row-label">Trazos</span><span class="k-row-val" id="kd-strokes"></span></div>
+    <div class="k-row"><span class="k-row-label">Significado</span><span class="k-row-val" id="kd-meaning"></span></div>
+    <div class="k-examples" id="kd-examples"></div>
+  </div>
+  <button class="action-btn" onclick="showToast('Abre Claude y pide: Crea ejercicios de escritura para el kanji seleccionado')">Practicar escritura con Claude</button>
+</div>
+
+<!-- GRAMÁTICA -->
+<div id="s-grammar" class="section">
+  <p class="section-title">Patrones gramaticales N3–N2</p>
+  <div id="grammar-list"></div>
+  <button class="action-btn" onclick="showToast('Abre Claude y pide ejercicios de práctica para los patrones gramaticales')">Ejercicios con Claude</button>
+</div>
+
+<!-- CONVERSACIÓN -->
+<div id="s-conv" class="section">
+  <p class="section-title">Elige un escenario</p>
+  <div class="scene-grid" id="scene-grid"></div>
+  <div class="dialog-wrap" id="dialog-wrap"></div>
+  <div class="tip-box" id="tip-box"></div>
+  <button class="action-btn" onclick="showToast('Abre Claude y di: Quiero practicar conversación en japonés para: ' + currentScene())">Practicar con Claude</button>
+</div>
+
+<!-- ESTADÍSTICAS -->
+<div id="s-stats" class="section">
+  <p class="section-title">Tu progreso</p>
+  <div class="stats-grid">
+    <div class="stat-box"><span class="stat-num">7</span><div class="stat-lbl">Días seguidos</div></div>
+    <div class="stat-box"><span class="stat-num">124</span><div class="stat-lbl">Palabras vistas</div></div>
+    <div class="stat-box"><span class="stat-num">9</span><div class="stat-lbl">Kanji dominados</div></div>
+    <div class="stat-box"><span class="stat-num">4</span><div class="stat-lbl">Patrones N3–N2</div></div>
+  </div>
+  <p class="section-title" style="margin-top:4px">Nivel actual</p>
+  <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:16px;">
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;color:var(--text2)">
+      <span>Vocabulario</span><span style="font-weight:500;color:var(--text)">68%</span>
+    </div>
+    <div class="prog-bar" style="margin-bottom:12px;height:6px"><div class="prog-fill" style="width:68%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;color:var(--text2)">
+      <span>Kanji</span><span style="font-weight:500;color:var(--text)">45%</span>
+    </div>
+    <div class="prog-bar" style="margin-bottom:12px;height:6px"><div class="prog-fill" style="width:45%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;color:var(--text2)">
+      <span>Gramática</span><span style="font-weight:500;color:var(--text)">55%</span>
+    </div>
+    <div class="prog-bar" style="height:6px"><div class="prog-fill" style="width:55%"></div></div>
+  </div>
+  <button class="action-btn" onclick="showToast('Abre Claude y pide: Dame un plan de estudio personalizado para mejorar mi japonés N3')">Plan de estudio personalizado</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('flash', this)">
+    <span class="nav-icon">📚</span>Vocab
+  </button>
+  <button class="nav-btn" onclick="switchTab('kanji', this)">
+    <span class="nav-icon">漢</span>Kanji
+  </button>
+  <button class="nav-btn" onclick="switchTab('grammar', this)">
+    <span class="nav-icon">文</span>Gramática
+  </button>
+  <button class="nav-btn" onclick="switchTab('conv', this)">
+    <span class="nav-icon">💬</span>Conversación
+  </button>
+  <button class="nav-btn" onclick="switchTab('stats', this)">
+    <span class="nav-icon">📊</span>Progreso
+  </button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const cards = [
+  {jp:'曖昧', reading:'あいまい (aimai)', meaning:'ambiguo, vago', level:'n3'},
+  {jp:'諦める', reading:'あきらめる (akirameru)', meaning:'rendirse, desistir', level:'n3'},
+  {jp:'余裕', reading:'よゆう (yoyuu)', meaning:'holgura, margen de tiempo', level:'n3'},
+  {jp:'丁寧', reading:'ていねい (teinei)', meaning:'amable, cuidadoso', level:'n4'},
+  {jp:'我慢', reading:'がまん (gaman)', meaning:'paciencia, aguantar', level:'n3'},
+  {jp:'気配り', reading:'きくばり (kikubari)', meaning:'atención a los demás', level:'n2'},
+  {jp:'雰囲気', reading:'ふんいき (fun\'iki)', meaning:'atmósfera, ambiente', level:'n3'},
+  {jp:'懐かしい', reading:'なつかしい (natsukashii)', meaning:'nostálgico, entrañable', level:'n3'},
+];
+
+const kanjiData = [
+  {char:'愛', on:'アイ', kun:'いと(しい)', strokes:13, meaning:'amor', examples:['愛情 (あいじょう) — afecto','愛する (あいする) — amar']},
+  {char:'時', on:'ジ', kun:'とき', strokes:10, meaning:'tiempo', examples:['時間 (じかん) — tiempo','時々 (ときどき) — a veces']},
+  {char:'気', on:'キ・ケ', kun:'いき', strokes:6, meaning:'espíritu', examples:['気持ち (きもち) — sentimiento','天気 (てんき) — clima']},
+  {char:'心', on:'シン', kun:'こころ', strokes:4, meaning:'corazón', examples:['心配 (しんぱい) — preocupación','安心 (あんしん) — tranquilidad']},
+  {char:'道', on:'ドウ', kun:'みち', strokes:12, meaning:'camino', examples:['道路 (どうろ) — carretera','武道 (ぶどう) — artes marciales']},
+  {char:'力', on:'リョク', kun:'ちから', strokes:2, meaning:'fuerza', examples:['努力 (どりょく) — esfuerzo','電力 (でんりょく) — energía']},
+  {char:'言', on:'ゲン', kun:'い(う)', strokes:7, meaning:'hablar', examples:['言葉 (ことば) — palabra','言語 (げんご) — idioma']},
+  {char:'思', on:'シ', kun:'おも(う)', strokes:9, meaning:'pensar', examples:['思い出 (おもいで) — recuerdo','思想 (しそう) — pensamiento']},
+  {char:'夢', on:'ム', kun:'ゆめ', strokes:13, meaning:'sueño', examples:['夢中 (むちゅう) — obsesionado','悪夢 (あくむ) — pesadilla']},
+];
+
+const grammarData = [
+  {title:'～ているところ', jp:'〜ている + ところ', level:'n3', desc:'Indica que una acción está en progreso exactamente en este momento. Equivale a "estar justo haciendo algo".',
+    ex:[{jp:'今、ご飯を食べているところです。', es:'Justo ahora estoy comiendo.'},{jp:'彼女は電話しているところだった。', es:'Ella estaba justo hablando por teléfono.'}]},
+  {title:'～ようにする', jp:'〜ように + する', level:'n3', desc:'Expresa el esfuerzo o intención de lograr algo. "Intentar hacer / procurar que..."',
+    ex:[{jp:'毎日運動するようにしています。', es:'Procuro hacer ejercicio todos los días.'},{jp:'遅刻しないようにしてください。', es:'Por favor intenta no llegar tarde.'}]},
+  {title:'～に対して', jp:'〜に + 対して', level:'n3', desc:'Indica dirección de sentimientos, actitudes o acciones hacia algo o alguien. "Hacia, con respecto a".',
+    ex:[{jp:'先生に対して敬意を持つべきだ。', es:'Deberías mostrar respeto hacia el profesor.'},{jp:'問題に対して冷静に対応した。', es:'Respondió calmamente ante el problema.'}]},
+  {title:'～わけがない', jp:'〜わけ + が + ない', level:'n2', desc:'Expresa que algo es imposible o no hay razón para que sea así. "No puede ser que..."',
+    ex:[{jp:'彼が嘘をつくわけがない。', es:'No puede ser que él esté mintiendo.'},{jp:'こんな問題が解けるわけがない。', es:'No hay forma de que pueda resolver este problema.'}]},
+  {title:'～ものの', jp:'〜もの + の', level:'n2', desc:'Conjunción que expresa contraste o contradicción. "Aunque / si bien..."',
+    ex:[{jp:'努力したものの、試験に落ちた。', es:'Aunque me esforcé, reprobé el examen.'},{jp:'行きたいものの、時間がない。', es:'Aunque quiero ir, no tengo tiempo.'}]},
+];
+
+const convData = [
+  {icon:'🍜', label:'Restaurante', dialog:[
+    {r:'a', jp:'いらっしゃいませ！何名様ですか？', es:'¡Bienvenido! ¿Cuántas personas son?'},
+    {r:'b', jp:'二人です。禁煙席をお願いします。', es:'Somos dos. Mesa de no fumadores, por favor.'},
+    {r:'a', jp:'かしこまりました。こちらへどうぞ。', es:'Por supuesto. Por aquí, por favor.'},
+    {r:'b', jp:'おすすめは何ですか？', es:'¿Qué recomienda?'},
+  ], tip:'💡 Usa "〜をお願いします" para pedidos corteses. "禁煙" (きんえん) = no fumador.'},
+  {icon:'🚃', label:'En el tren', dialog:[
+    {r:'a', jp:'すみません、この電車は渋谷に止まりますか？', es:'Disculpe, ¿este tren para en Shibuya?'},
+    {r:'b', jp:'はい、三駅先です。', es:'Sí, está a tres paradas.'},
+    {r:'a', jp:'ありがとうございます。', es:'Muchas gracias.'},
+    {r:'b', jp:'どういたしまして。良い旅を！', es:'De nada. ¡Buen viaje!'},
+  ], tip:'💡 "〜に止まりますか" es clave para el transporte. "先" (さき) = más adelante.'},
+  {icon:'🏥', label:'En el médico', dialog:[
+    {r:'a', jp:'どうなさいましたか？', es:'¿Qué le pasa?'},
+    {r:'b', jp:'昨日から熱と喉の痛みがあります。', es:'Desde ayer tengo fiebre y dolor de garganta.'},
+    {r:'a', jp:'アレルギーはありますか？', es:'¿Tiene alergias?'},
+    {r:'b', jp:'特にないと思います。', es:'Creo que no tengo ninguna en particular.'},
+  ], tip:'💡 Síntomas: 熱 (ねつ) fiebre, 咳 (せき) tos, 痛み (いたみ) dolor, 頭痛 (ずつう) jaqueca.'},
+  {icon:'🏪', label:'De compras', dialog:[
+    {r:'a', jp:'このサイズはありますか？', es:'¿Tienen esta talla?'},
+    {r:'b', jp:'少々お待ちください。確認いたします。', es:'Un momento. Voy a verificar.'},
+    {r:'a', jp:'試着してもいいですか？', es:'¿Puedo probármelo?'},
+    {r:'b', jp:'もちろんです。試着室はあちらです。', es:'Por supuesto. El probador está allá.'},
+  ], tip:'💡 "〜してもいいですか" pide permiso cortésmente. "試着室" (しちゃくしつ) = probador.'},
+];
+
+let fcIdx = 0, revealed = false, activeScene = 0;
+
+function currentWord() { return cards[fcIdx].jp + ' (' + cards[fcIdx].meaning + ')'; }
+function currentScene() { return convData[activeScene].label; }
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + tab).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function updateCard() {
+  revealed = false;
+  const c = cards[fcIdx];
+  document.getElementById('fc-char').textContent = c.jp;
+  document.getElementById('fc-reading').style.display = 'none';
+  document.getElementById('fc-meaning').style.display = 'none';
+  document.getElementById('fc-hint').style.display = 'block';
+  document.getElementById('fc-tag').textContent = c.level.toUpperCase();
+  document.getElementById('fc-tag').className = 'fc-tag tag-' + c.level;
+  document.getElementById('rate-btns').style.display = 'none';
+  document.getElementById('fc-count').textContent = (fcIdx+1) + '/' + cards.length;
+  document.getElementById('fc-fill').style.width = ((fcIdx+1)/cards.length*100) + '%';
+}
+
+function revealCard() {
+  if (revealed) return;
+  revealed = true;
+  document.getElementById('fc-reading').style.display = 'block';
+  document.getElementById('fc-meaning').style.display = 'block';
+  document.getElementById('fc-hint').style.display = 'none';
+  document.getElementById('rate-btns').style.display = 'grid';
+}
+
+function rateCard() {
+  fcIdx = (fcIdx + 1) % cards.length;
+  updateCard();
+  if (fcIdx === 0) showToast('¡Vuelta completa! Sigue practicando 🎉');
+}
+
+function buildKanji() {
+  const g = document.getElementById('kanji-grid');
+  kanjiData.forEach((k, i) => {
+    const d = document.createElement('div');
+    d.className = 'k-card';
+    d.innerHTML = '<span class="k-char">' + k.char + '</span><div class="k-on">' + k.on + '</div><div class="k-meaning">' + k.meaning + '</div>';
+    d.onclick = () => selectKanji(i, d);
+    g.appendChild(d);
+  });
+}
+
+function selectKanji(i, el) {
+  document.querySelectorAll('.k-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  const k = kanjiData[i];
+  document.getElementById('kd-char').textContent = k.char;
+  document.getElementById('kd-on').textContent = k.on;
+  document.getElementById('kd-kun').textContent = k.kun;
+  document.getElementById('kd-strokes').textContent = k.strokes + ' trazos';
+  document.getElementById('kd-meaning').textContent = k.meaning;
+  document.getElementById('kd-examples').innerHTML = '<div style="font-size:12px;color:var(--text3);margin-top:10px;margin-bottom:5px;">Ejemplos</div>' + k.examples.map(e => '<div class="k-ex">' + e + '</div>').join('');
+  document.getElementById('k-detail').classList.add('show');
+}
+
+function buildGrammar() {
+  const list = document.getElementById('grammar-list');
+  grammarData.forEach((g, i) => {
+    const d = document.createElement('div');
+    d.className = 'g-item';
+    d.innerHTML = '<div class="g-header"><div><div class="g-title">' + g.title + '</div><div class="g-jp">' + g.jp + '</div></div><span class="g-level lv-' + g.level + '">' + g.level.toUpperCase() + '</span></div><div class="g-body"><div class="g-desc">' + g.desc + '</div>' + g.ex.map(e => '<div class="g-ex"><div class="g-ex-jp">' + e.jp + '</div><div class="g-ex-es">' + e.es + '</div></div>').join('') + '</div>';
+    d.querySelector('.g-header').onclick = () => {
+      const body = d.querySelector('.g-body');
+      const isOpen = body.classList.contains('open');
+      document.querySelectorAll('.g-body').forEach(b => b.classList.remove('open'));
+      document.querySelectorAll('.g-item').forEach(it => it.classList.remove('open'));
+      if (!isOpen) { body.classList.add('open'); d.classList.add('open'); }
+    };
+    list.appendChild(d);
+  });
+}
+
+function buildConv() {
+  const sg = document.getElementById('scene-grid');
+  convData.forEach((c, i) => {
+    const d = document.createElement('div');
+    d.className = 'scene-card' + (i===0?' sel':'');
+    d.innerHTML = '<span class="scene-icon">' + c.icon + '</span><span class="scene-label">' + c.label + '</span>';
+    d.onclick = () => selectScene(i, d);
+    sg.appendChild(d);
+  });
+  renderDialog(0);
+}
+
+function selectScene(i, el) {
+  activeScene = i;
+  document.querySelectorAll('.scene-card').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  renderDialog(i);
+}
+
+function renderDialog(i) {
+  const c = convData[i];
+  document.getElementById('dialog-wrap').innerHTML = c.dialog.map(l => '<div class="d-line d-' + l.r + '"><span class="d-speaker">' + (l.r==='a'?'日本人':'あなた') + '</span><div class="d-jp">' + l.jp + '</div><div class="d-es">' + l.es + '</div></div>').join('');
+  document.getElementById('tip-box').textContent = c.tip;
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// Show install banner after 3s
+setTimeout(() => {
+  if (!window.matchMedia('(display-mode: standalone)').matches) {
+    document.getElementById('install-banner').style.display = 'flex';
+  }
+}, 3000);
+
+buildKanji();
+buildGrammar();
+buildConv();
+updateCard();
+</script>
+</body>
+</html>
